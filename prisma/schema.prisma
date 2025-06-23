@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Nemovitost {
+  id        Int        @id @default(autoincrement())
+  nazev     String
+  adresa    String
+  najemnici Najemnik[]
+}
+
+model Najemnik {
+  id           Int        @id @default(autoincrement())
+  jmeno        String
+  email        String
+  nemovitostId Int
+  nemovitost   Nemovitost @relation(fields: [nemovitostId], references: [id])
+  platby       Platba[]
+  meridla      Meridlo[]
+  ukoly        Ukol[]
+  mesicniNajem Float      @default(12000)
+}
+
+model Platba {
+  id         Int      @id @default(autoincrement())
+  castka     Float
+  datum      DateTime
+  najemnikId Int
+  najemnik   Najemnik @relation(fields: [najemnikId], references: [id])
+}
+
+model Ukol {
+  id         Int      @id @default(autoincrement())
+  popis      String
+  datum      DateTime @default(now())
+  status     String   @default("nový")
+  najemnikId Int
+  najemnik   Najemnik @relation(fields: [najemnikId], references: [id])
+}
+
+model Meridlo {
+  id         Int      @id @default(autoincrement())
+  typ        String
+  hodnota    Float
+  datum      DateTime @default(now())
+  najemnikId Int
+  najemnik   Najemnik @relation(fields: [najemnikId], references: [id])
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  password   String
+  role       String
+  isActive   Boolean     @default(true)
+  apartments Apartment[] // vztah na byty
+}
+
+model Apartment {
+  id            Int         @id @default(autoincrement())
+  address       String
+  city          String
+  postalCode    String
+  purchasePrice Float?
+  currentValue  Float?
+  purchaseDate  DateTime?
+  parent        Apartment?  @relation("ParentChild", fields: [parentId], references: [id])
+  parentId      Int? // náš nový sloupec
+  children      Apartment[] @relation("ParentChild")
+  ownerId       Int
+  owner         User        @relation(fields: [ownerId], references: [id])
+  tenants       Tenant[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  insuranceAnnualPrice Float?     // roční cena
+  insuranceNumber       String?  // číslo pojistky
+  insuranceNote         String?  // poznámka
+    ownershipType       String?    // Vlastnictví
+  buildingType        String?    // Typ
+  buildingConstruction String?   // Konstrukce budovy
+  heatingType         String?    // Vytápění
+  area                Float?     // Výměra
+  eicCode             String?
+  eanCode             String?
+  floorNumber         Int?       // Umístění na podlaží
+  totalFloorsAbove    Int?
+  totalFloorsBelow    Int?
+  hasElevator         Boolean?   @default(false)
+  hasBalcony          Boolean?   @default(false)
+  hasLoggia           Boolean?   @default(false)
+  hasTerrace          Boolean?   @default(false)
+  hasStorage          Boolean?   @default(false)
+  technicalNote       String?    // Poznámka
+
+}
+
+model Tenant {
+  id          Int        @id @default(autoincrement())
+  name        String
+  phone       String?
+  apartment   Apartment? @relation(fields: [apartmentId], references: [id])
+  apartmentId Int?
+}

@@ -1,0 +1,23 @@
+.reset-password-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.reset-password-container h2 {
+  text-align: center;
+}
+
+.reset-password-container form div {
+  margin-bottom: 1rem;
+}
+
+.reset-password-container .error {
+  color: red;
+}
+
+.reset-password-container .success {
+  color: green;
+}
